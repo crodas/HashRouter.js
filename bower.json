@@ -1,0 +1,24 @@
+{
+  "name": "HashRouter",
+  "main": "HashRouter.js",
+  "homepage": "https://github.com/crodas/HashRouter.js",
+  "description": "Super simple URL dispatcher for single page apps.",
+  "moduleType": [],
+  "keywords": [
+    "url",
+    "router",
+    "single-page",
+    "apps"
+  ],
+  "authors": [
+    "Cesar Rodas <cesar@rodas.me>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
