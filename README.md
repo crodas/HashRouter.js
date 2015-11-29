@@ -18,6 +18,10 @@ hRoute.route("foo/bar/:page", function(page) {
 hRoute.route("list/:table/:page", function(table, page) {
 });
 
+hRoute.addFilter('page', function(page) {
+    return parseInt(page) >= 1;
+});
+
 hRoute.ready(); // do the initial route.
 
 console.error(hRoute.url("my_page", 99));
