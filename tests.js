@@ -15,6 +15,13 @@ hRouter.route('foo/:page/bar', function(page) {
 }).name("page3").setDefault("page", 1);
 
 hRouter.route('foo/bar/:word', function(word) {
+    window.lastWord5 = word;
+}).preRoute(function() {
+    return !!window.preRoute;
+});
+
+
+hRouter.route('foo/bar/:word', function(word) {
     window.lastWord = word;
 }).name("foobar_word");
 
@@ -34,13 +41,33 @@ function AsyncLoop(vars, done) {
     run();
 }
 
-QUnit.test("word", function(assert) {
+QUnit.test("word1", function(assert) {
     var done = assert.async();
+    window.preRoute = false;
     function redirect(i) {
         return function(next) {
             document.location.href = "#foo/bar/" + i;
             setTimeout(function() {
                 assert.equal(i, window.lastWord);
+                next();
+            });
+        };
+    }
+    var tests = [];
+    for (var i = 1; i <= 5; i++) {
+        tests.push(redirect("w" + i));
+    }
+    AsyncLoop(tests, done);
+});
+
+QUnit.test("word2", function(assert) {
+    var done = assert.async();
+    window.preRoute = true;
+    function redirect(i) {
+        return function(next) {
+            document.location.href = "#foo/bar/" + i;
+            setTimeout(function() {
+                assert.equal(i, window.lastWord5);
                 next();
             });
         };

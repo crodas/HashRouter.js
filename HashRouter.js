@@ -36,9 +36,15 @@ var HashRouter = (function(window) {
         this.parts  = Array.prototype.concat.apply([], parts);
         this.vars   = vars;
         this.varPos = varPos;
+        this._preRoute = [];
         this.text   = text;
         this.callback = callback;
     }
+    Route.prototype.preRoute = function(callback) {
+        checkFunction(callback);
+        this._preRoute.push(callback);
+        return this;
+    };
     Route.prototype.name = function(name) {
         routesByName[name] = this;
         return this;
@@ -97,6 +103,12 @@ var HashRouter = (function(window) {
                     return false;
                 }
                 vars.push(parts[e]);
+            }
+        }
+
+        for (var i = 0; i < this._preRoute.length; ++i) {
+            if (this._preRoute[i]() === false) {
+                return false;
             }
         }
 
