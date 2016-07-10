@@ -1,4 +1,4 @@
-var HashRouter = (function(window) {
+var hRouter = HashRouter = (function(window) {
     var ns = {};
     var regex  = [];
     var routes = [];
@@ -177,4 +177,6 @@ var HashRouter = (function(window) {
     return ns;
 })(this);
 
-var hRouter = HashRouter;
+if (typeof exports === 'object') {
+    exports.HashRouter = HashRouter;
+}
