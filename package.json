@@ -1,6 +1,6 @@
 {
   "name": "tiny-hash-router",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Super tiny router library with document.location.hash",
   "main": "distribution/router.js",
   "scripts": {
