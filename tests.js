@@ -1,3 +1,4 @@
+var hRouter = new HashRouter.Router;
 hRouter.addFilter('page', function(page) {
     return parseInt(page) > 0;
 });
@@ -97,6 +98,7 @@ QUnit.test("page3", function(assert) {
     AsyncLoop(tests, done);
 });
 
+hRouter.registerListener();
 
 QUnit.test("page1", function(assert) {
     var done = assert.async();
@@ -120,7 +122,7 @@ QUnit.test("page2", function(assert) {
     var done = assert.async();
     function redirect(i) {
         return function(next) {
-            document.location.href = "#foo/bar/" + i + "/" + (5+i);
+            document.location.href = "#/foo////bar/" + i + "/" + (5+i);
             setTimeout(function() {
                 assert.equal(i, window.lastPage2[0]);
                 assert.equal(i+5, window.lastPage2[1]);
@@ -167,7 +169,7 @@ QUnit.test("invalid_args_generate_url", function(assert) {
 
 QUnit.test("generate_url", function(assert) {
     for (var i = 1; i < 50; i++) {
-        assert.equal("#foo/bar/" + i, hRouter.url("page1", i));
-        assert.equal("#foo/bar/" + i + "/" + (i+6), hRouter.url("page2", i, i+6));
+        assert.equal("/foo/bar/" + i, hRouter.url("page1", i));
+        assert.equal("/foo/bar/" + i + "/" + (i+6), hRouter.url("page2", i, i+6));
     }
 });

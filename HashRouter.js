@@ -1,182 +1,285 @@
-var hRouter = HashRouter = (function(window) {
-    var ns = {};
-    var regex  = [];
-    var routes = [];
-    var routesByName = {};
-    var globalFilter = {};
+var HashRouter =
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
 
-    function Route(url, callback) {
-        var vars  = {};
-        var varPos = [];
-        var text  = [];
-        if (url instanceof RegExp) {
-            this.url = url;
-            this.callback = callback;
-            return;
-        }
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
 
-        var parts = url.split(/\/+/g).map(function(part) {
-            if (part.match(/^:[a-z_][a-z0-9_]*$/i)) {
-                vars[part.substr(1)] = {};
-                varPos.push(part.substr(1));
-                text.push(null);
-                return ['/', vars[part.substr(1)]]
-            }
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId])
+/******/ 			return installedModules[moduleId].exports;
 
-            text.push(part);
-            return ['/', part];
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			exports: {},
+/******/ 			id: moduleId,
+/******/ 			loaded: false
+/******/ 		};
 
-        });
-        parts[0][0] = "#"; // swap the first / for #.
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
 
-        this.minLength = text.length;
-        this.maxLength = text.length;
-        this.filter = {};
-        this.url    = url;
-        this.parts  = Array.prototype.concat.apply([], parts);
-        this.vars   = vars;
-        this.varPos = varPos;
-        this._preRoute = [];
-        this.text   = text;
-        this.callback = callback;
-    }
-    Route.prototype.preRoute = function(callback) {
-        checkFunction(callback);
-        this._preRoute.push(callback);
-        return this;
-    };
-    Route.prototype.name = function(name) {
-        routesByName[name] = this;
-        return this;
-    }
-    Route.prototype.generate = function(args) {
-        var id  = 0;
-        var varPos = this.varPos;
-        return this.parts.map(function(part) {
-            if (typeof part === "object") {
-                var name  = varPos[id];
-                var value = args[id++] || part.default;
-                if (!value) {
-                    throw new Error("cannot find variable " + part + " in the arguments");
-                }
-                if (globalFilter[name] && !globalFilter[name](value)) {
-                    throw new Error(value + " is not a valid " + name);
-                }
-                return value;
-            }
+/******/ 		// Flag the module as loaded
+/******/ 		module.loaded = true;
 
-            return part;
-        }).join('');
-        return 
-    }
-    Route.prototype.setDefault = function(name, value) {
-        if (!this.vars.hasOwnProperty(name)) {
-            throw new Error("cannot find variable " + name);
-        }
-        this.vars[name]['default'] = value;
-        return this;
-    }
-
-    Route.prototype.isCandidate = function(parts, vars) {
-        var i, e, x = 0, zvar;
-
-        // Mininum length?
-        if (this.minLength > parts.length || this.maxLength < parts.length) {
-            return false;
-        }
-
-        // Fail sooner, check all the static content (no placeholders/variables)
-        for (i = 0, e = 0; i < parts.length && e < this.text.length; ++e, ++i ) {
-            if (this.text[e] !== null && parts[i] !== this.text[e]) {
-                return false;
-            }
-        }
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
 
 
-        // check all the variables and their filters/validators
-        for (i = 0, e = 0; i < parts.length && e < this.text.length; ++e, ++i ) {
-            if (this.text[e] === null) {
-                zvar = this.varPos[x++];
-                if (this.filter[zvar] && !this.filter[zvar](parts[e])) {
-                    return false;
-                } else if (globalFilter[zvar] && !globalFilter[zvar](parts[e])) {
-                    return false;
-                }
-                vars.push(parts[e]);
-            }
-        }
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
 
-        for (var i = 0; i < this._preRoute.length; ++i) {
-            if (this._preRoute[i]() === false) {
-                return false;
-            }
-        }
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
 
-        return true;
-    };
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
 
-    function checkFunction(obj) {
-        if (!(obj instanceof Function)) {
-            throw new Error("callback should be a valid function");
-        }
-    }
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(0);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ function(module, exports) {
 
-    function doRoute() {
-        var parts = document.location.hash.substr(1).split(/\/+/g);
-        var vars;
-        for (var i in routes) {
-            vars = [];
-            if (!routes.hasOwnProperty(i) || !routes[i].isCandidate(parts, vars)) {
-                continue;
-            }
+	'use strict';
 
-            return routes[i].callback.apply(null, vars);
-        }
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
 
-        for (var i in regex) {
-            if (regex.hasOwnProperty(i) && document.location.href.match(regex[i].url)) {
-                return regex[i].callback.apply(null, vars);
-            }
-        }
-    }
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
-    if ("addEventListener" in window) {
-        window.addEventListener("hashchange", doRoute, false);
-    } else {
-        window.onhashchange = doRoute;
-    }
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-    ns.ready = doRoute;
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-    ns.url = function(name) {
-        if (!(routesByName[name] instanceof Route)) {
-            throw new Error("Cannot find " + name + " url");
-        }
+	function checkFunction(obj) {
+	    if (!(obj instanceof Function)) {
+	        throw new Error("callback should be a valid function");
+	    }
+	}
 
-        return routesByName[name].generate(Array.prototype.slice.call(arguments, 1));
-    };
+	var Route = function () {
+	    function Route(router, url, callback) {
+	        _classCallCheck(this, Route);
 
-    ns.addFilter = function(name, callback) {
-        checkFunction(callback);
-        globalFilter[name] = callback;
-        return this;
-    };
+	        this.router = router;
+	        this.url = url;
+	        this.callback = callback;
 
-    ns.route = function(url, callback) {
-        checkFunction(callback);
-        var r = new Route(url, callback);
-        if (url instanceof RegExp) {
-            regex.push(r);
-        } else { 
-            routes.push(r);
-        }
+	        if (url instanceof RegExp) {
+	            return;
+	        }
 
-        return r;
-    };
+	        var vars = {};
+	        var varPos = [];
+	        var text = [];
+	        var parts = url.split(/\/+/g).map(function (part) {
+	            if (part.match(/^:[a-z_][a-z0-9_]*$/i)) {
+	                vars[part.substr(1)] = {};
+	                varPos.push(part.substr(1));
+	                text.push(null);
+	                return ['/', vars[part.substr(1)]];
+	            }
 
-    return ns;
-})(this);
+	            text.push(part);
+	            return ['/', part];
+	        });
 
-if (typeof exports === 'object') {
-    exports.HashRouter = HashRouter;
-}
+	        this.minLength = text.length;
+	        this.maxLength = text.length;
+	        this.filter = {};
+	        this.url = url;
+	        this.parts = Array.prototype.concat.apply([], parts);
+	        this.vars = vars;
+	        this.varPos = varPos;
+	        this.text = text;
+	        this._preRoute = [];
+	    }
+
+	    _createClass(Route, [{
+	        key: 'preRoute',
+	        value: function preRoute(callback) {
+	            checkFunction(callback);
+	            this._preRoute.push(callback);
+	            return this;
+	        }
+	    }, {
+	        key: 'name',
+	        value: function name(_name) {
+	            this.router.routesByName[_name] = this;
+	            return this;
+	        }
+	    }, {
+	        key: 'setDefault',
+	        value: function setDefault(name, value) {
+	            if (!this.vars.hasOwnProperty(name)) {
+	                throw new Error("cannot find variable " + name);
+	            }
+	            this.vars[name]['default'] = value;
+	            return this;
+	        }
+	    }, {
+	        key: 'isCandidate',
+	        value: function isCandidate(parts, vars) {
+	            var i,
+	                e,
+	                x = 0,
+	                zvar;
+
+	            // Mininum length?
+	            if (this.minLength > parts.length || this.maxLength < parts.length) {
+	                return false;
+	            }
+
+	            // Fail sooner, check all the static content (no placeholders/variables)
+	            for (i = 0, e = 0; i < parts.length && e < this.text.length; ++e, ++i) {
+	                if (this.text[e] !== null && parts[i] !== this.text[e]) {
+	                    return false;
+	                }
+	            }
+
+	            // check all the variables and their filters/validators
+	            for (i = 0, e = 0; i < parts.length && e < this.text.length; ++e, ++i) {
+	                if (this.text[e] === null) {
+	                    zvar = this.varPos[x++];
+	                    if (this.filter[zvar] && !this.filter[zvar](parts[e])) {
+	                        return false;
+	                    } else if (this.router.globalFilter[zvar] && !this.router.globalFilter[zvar](parts[e])) {
+	                        return false;
+	                    }
+	                    vars.push(parts[e]);
+	                }
+	            }
+
+	            for (var i = 0; i < this._preRoute.length; ++i) {
+	                if (this._preRoute[i]() === false) {
+	                    return false;
+	                }
+	            }
+
+	            return true;
+	        }
+	    }, {
+	        key: 'generate',
+	        value: function generate(args) {
+	            var _this = this;
+
+	            var id = 0;
+	            return this.parts.map(function (part) {
+	                if ((typeof part === 'undefined' ? 'undefined' : _typeof(part)) === 'object') {
+	                    var name = _this.varPos[id];
+	                    var value = args[id++] || part.default;
+	                    if (!value) {
+	                        throw new Error("cannot find variable " + part + " in the arguments");
+	                    }
+	                    if (_this.router.globalFilter[name] && !_this.router.globalFilter[name](value)) {
+	                        throw new Error(value + " is not a valid " + name);
+	                    }
+	                    return value;
+	                }
+
+	                return part;
+	            });
+	        }
+	    }]);
+
+	    return Route;
+	}();
+
+	var Router = function () {
+	    function Router() {
+	        _classCallCheck(this, Router);
+
+	        this.globalFilter = {};
+	        this.regex = [];
+	        this.routes = [];
+	        this.routesByName = {};
+	        this.globalFilter = {};
+	    }
+
+	    _createClass(Router, [{
+	        key: 'run',
+	        value: function run() {
+	            var url = arguments.length <= 0 || arguments[0] === undefined ? document.location.hash.substr(1) : arguments[0];
+
+	            var parts = url.split(/\/+/g).filter(function (part) {
+	                return part.length > 0;
+	            });
+	            var vars;
+	            for (var i = 0; i < this.routes.length; ++i) {
+	                vars = [];
+	                if (!this.routes[i].isCandidate(parts, vars)) {
+	                    continue;
+	                }
+
+	                return this.routes[i].callback.apply(null, vars);
+	            }
+
+	            for (var _i = 0; _i < this.regex.length; ++_i) {
+	                if (url.match(this.regex[_i].url)) {
+	                    return this.regex[_i].callback.apply(null, vars);
+	                }
+	            }
+	        }
+	    }, {
+	        key: 'registerListener',
+	        value: function registerListener() {
+	            var _this2 = this;
+
+	            var doRoute = function doRoute() {
+	                _this2.run();
+	            };
+	            if ("addEventListener" in window) {
+	                window.addEventListener("hashchange", doRoute, false);
+	            } else {
+	                window.onhashchange = doRoute;
+	            }
+	            doRoute();
+	        }
+	    }, {
+	        key: 'url',
+	        value: function url(name) {
+	            if (!(this.routesByName[name] instanceof Route)) {
+	                throw new Error("Cannot find " + name + " url");
+	            }
+
+	            for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+	                args[_key - 1] = arguments[_key];
+	            }
+
+	            return this.routesByName[name].generate(args).join('');
+	        }
+	    }, {
+	        key: 'addFilter',
+	        value: function addFilter(name, callback) {
+	            checkFunction(callback);
+	            this.globalFilter[name] = callback;
+	            return this;
+	        }
+	    }, {
+	        key: 'route',
+	        value: function route(url, callback) {
+	            var route = new Route(this, url, callback);
+	            if (url instanceof RegExp) {
+	                this.regex.push(route);
+	            } else {
+	                this.routes.push(route);
+	            }
+
+	            return route;
+	        }
+	    }]);
+
+	    return Router;
+	}();
+
+	exports.default = Router;
+	exports.Router = Router;
+
+/***/ }
+/******/ ]);
