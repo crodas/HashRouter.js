@@ -3,6 +3,10 @@ hRouter.addFilter('page', function(page) {
     return parseInt(page) > 0;
 });
 
+x = hRouter.route("/", function() {
+    window.lastPage = 'homepage';
+}).name("default");
+
 hRouter.route('foo/bar/:page', function(page) {
     window.lastPage1 = parseInt(page);
 }).name("page1").setDefault("page", 1);
@@ -137,6 +141,33 @@ QUnit.test("page2", function(assert) {
     AsyncLoop(tests, done);
 });
 
+QUnit.test("default", function(assert) {
+    var next = assert.async();
+    document.location.hash = '';
+    setTimeout(function() {
+        assert.equal('homepage', window.lastPage);
+        next();
+    });
+});
+
+QUnit.test("default-hash", function(assert) {
+    var next = assert.async();
+    document.location.hash = '#';
+    setTimeout(function() {
+        assert.equal('homepage', window.lastPage);
+        next();
+    });
+});
+
+QUnit.test("default-hash-slash", function(assert) {
+    var next = assert.async();
+    document.location.hash = '#/';
+    setTimeout(function() {
+        assert.equal('homepage', window.lastPage);
+        next();
+    });
+});
+
 QUnit.test("catchAll", function(assert) {
     var done = assert.async();
     function redirect(i) {
@@ -169,6 +200,7 @@ QUnit.test("invalid_args_generate_url", function(assert) {
 
 QUnit.test("generate_url", function(assert) {
     for (var i = 1; i < 50; i++) {
+        assert.equal("", hRouter.url('default'));
         assert.equal("/foo/bar/" + i, hRouter.url("page1", i));
         assert.equal("/foo/bar/" + i + "/" + (i+6), hRouter.url("page2", i, i+6));
     }

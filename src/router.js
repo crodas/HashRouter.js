@@ -9,6 +9,8 @@ class Route {
         this.router = router;
         this.url = url;
         this.callback = callback;
+        this.filter = {};
+        this._preRoute = [];
 
         if (url instanceof RegExp) {
             return;
@@ -17,7 +19,7 @@ class Route {
         let vars = {};
         let varPos = [];
         let text = [];
-        let parts = url.split(/\/+/g).map((part) => {
+        let parts = url.split(/\/+/g).filter((p) => { return p.length > 0 }).map((part) => {
             if (part.match(/^:[a-z_][a-z0-9_]*$/i)) {
                 vars[part.substr(1)] = {};
                 varPos.push(part.substr(1));
@@ -32,13 +34,11 @@ class Route {
 
         this.minLength = text.length;
         this.maxLength = text.length;
-        this.filter = {};
         this.url    = url;
         this.parts  = Array.prototype.concat.apply([], parts);
         this.vars   = vars;
         this.varPos = varPos;
         this.text   = text;
-        this._preRoute = [];
     }
     preRoute(callback) {
         checkFunction(callback)

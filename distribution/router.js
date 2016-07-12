@@ -23,6 +23,8 @@ var Route = function () {
         this.router = router;
         this.url = url;
         this.callback = callback;
+        this.filter = {};
+        this._preRoute = [];
 
         if (url instanceof RegExp) {
             return;
@@ -31,7 +33,9 @@ var Route = function () {
         var vars = {};
         var varPos = [];
         var text = [];
-        var parts = url.split(/\/+/g).map(function (part) {
+        var parts = url.split(/\/+/g).filter(function (p) {
+            return p.length > 0;
+        }).map(function (part) {
             if (part.match(/^:[a-z_][a-z0-9_]*$/i)) {
                 vars[part.substr(1)] = {};
                 varPos.push(part.substr(1));
@@ -45,13 +49,11 @@ var Route = function () {
 
         this.minLength = text.length;
         this.maxLength = text.length;
-        this.filter = {};
         this.url = url;
         this.parts = Array.prototype.concat.apply([], parts);
         this.vars = vars;
         this.varPos = varPos;
         this.text = text;
-        this._preRoute = [];
     }
 
     _createClass(Route, [{
