@@ -8,9 +8,24 @@ I wrote some [URL dispatchers](https://github.com/crodas/Dispatcher) for server-
 
 All the routes are attached in the hash (`document.location.hash`).
 
+
+## Installation
+
+### npm/webpack
+```bash
+npm install --save tiny-hash-router
+```
+
+### Bower
+
+```bash
+bower install --save HashRouter
+```
+
 ## How?
 
 ```js
+var hRouter = new HashRouter.Router;
 hRoute.route("foo/bar/:page", function(page) {
   console.error("foo/bar on page", page);
 }).name("my_route").setDefault("page", 1);
@@ -22,9 +37,15 @@ hRoute.addFilter('page', function(page) {
     return parseInt(page) >= 1;
 });
 
-hRoute.ready(); // do the initial route.
+hRoute.registerListener(); // do the initial route.
 
 console.error(hRoute.url("my_page", 99));
+```
+
+Or you can use it directly with WebPack.
+
+```
+import Router from 'tiny-
 ```
 
 The library  will listen to any change in the `document.location.hash`, and any change will trigger the newer action.
