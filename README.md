@@ -45,7 +45,23 @@ console.error(hRoute.url("my_page", 99));
 Or you can use it directly with WebPack.
 
 ```
-import Router from 'tiny-
+import Router from 'tiny-hash-router'
+
+let hRoute = new Router;
+hRoute.route("foo/bar/:page", function(page) {
+  console.error("foo/bar on page", page);
+}).name("my_route").setDefault("page", 1);
+
+hRoute.route("list/:table/:page", function(table, page) {
+});
+
+hRoute.addFilter('page', function(page) {
+    return parseInt(page) >= 1;
+});
+
+hRoute.registerListener(); // do the initial route.
+
+console.error(hRoute.url("my_page", 99));
 ```
 
 The library  will listen to any change in the `document.location.hash`, and any change will trigger the newer action.
